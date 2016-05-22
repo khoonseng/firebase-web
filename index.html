@@ -1,0 +1,284 @@
+<html>
+<head>
+	<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+	<script>
+		// Initialize Firebase
+		var config = {
+		apiKey: "AIzaSyBVsuRwgD8HOft-_9qM-VxUAmdh74FvHkY",
+		authDomain: "ks-realtimeapp.firebaseapp.com",
+		databaseURL: "https://ks-realtimeapp.firebaseio.com",
+		storageBucket: "ks-realtimeapp.appspot.com"
+		};
+		firebase.initializeApp(config);
+	</script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+	<script src="https://cdn.firebase.com/libs/angularfire/1.2.0/angularfire.min.js"/></script>
+	<script type="text/javascript">
+	var usersRef = firebase.database().ref("users");	
+	var user = firebase.auth().currentUser;
+	var email;
+	var password;
+	var auth = firebase.auth();
+	var googleProvider = new firebase.auth.GoogleAuthProvider();
+	googleProvider.addScope('https://www.googleapis.com/auth/plus.login');
+	var fbProvider = new firebase.auth.FacebookAuthProvider();
+	
+	$( document ).ready(function() {
+		console.log( "ready!" );
+		$("#login").hide();
+		if (user) {
+		  // User is signed in.
+		  $("#logOut").show();
+		} else {
+		  // No user is signed in.
+		  $("#logOut").hide();
+		}
+	});
+
+	function createNewUser() {
+		email = $("#signUpEmail").val();
+		password = $("#signUpPassword").val();
+		isRegistered = true;
+		
+		firebase.auth().createUserWithEmailAndPassword(email, password).then(function() {
+			console.log("new account created");
+			user = firebase.auth().currentUser;
+			
+			usersRef.child(user.uid).set({
+				name: email,
+				isOnline: true
+			});
+		}, function(error) {
+		  console.log(error.code + " : " + error.message);
+		});
+	}
+	
+	function updateOnlineStatus(status, user) {
+		console.log(user.uid);
+		usersRef.child(user.uid).update({isOnline: status});
+	}
+	
+	function login() {
+		email = $("#loginEmail").val();
+		password = $("#loginPassword").val();	
+		firebase.auth().signInWithEmailAndPassword(email, password).then(function() {	
+			user = firebase.auth().currentUser;
+			console.log(user.uid);
+			updateOnlineStatus(true, user);
+		},function(error) {
+		  console.log(error.code + " : " + error.message);
+		});
+	}
+			
+	function logOut() {
+		user = firebase.auth().currentUser;
+		console.log(user.uid);
+		firebase.auth().signOut().then(function() {
+		  // Sign-out successful.
+			updateOnlineStatus(false, user);
+			$("#logOut").hide();
+		}, function(error) {
+		  // An error happened.
+		  console.log(error.code + " : " + error.message);
+		});
+	}
+	
+	function googleLogin() {
+		firebase.auth().signInWithRedirect(googleProvider);
+	}
+	
+	function fbLogin() {
+		auth.signInWithRedirect(fbProvider);
+		checkLoginState();
+	}
+	
+	firebase.auth().getRedirectResult().then(function(result) {
+	  if (result.credential) {
+		// This gives you a Google Access Token. You can use it to access the Google API.
+		var token = result.credential.accessToken;
+		// ...
+	  }
+		// The signed-in user info.
+		var user = result.user;
+		console.log(user);
+		if (user != null) {
+			var username;
+			if (user.displayName === null && typeof user.displayName === "object") {
+				username = user.email.substring(0, user.email.lastIndexOf("@"));
+			} else {
+				username = user.displayName;
+			}
+			console.log(username);
+			usersRef.child(user.uid).set({
+				name: username,
+				isOnline: true
+			});
+		}
+	  }).catch(function(error) {
+	  // Handle Errors here.
+	  var errorCode = error.code;
+	  var errorMessage = error.message;
+	  // The email of the user's account used.
+	  var email = error.email;
+	  // The firebase.auth.AuthCredential type that was used.
+	  var credential = error.credential;
+	  // ...
+	});
+		
+	
+	firebase.auth().onAuthStateChanged(function(user) {
+	  if (user) {
+		// User is signed in.
+		$("#logOut").show();
+		user.providerData.forEach(function (profile) {
+			console.log("Sign-in provider: "+profile.providerId);
+			console.log("  Provider-specific UID: "+profile.uid);
+			console.log("  Name: "+profile.displayName);
+			console.log("  Email: "+profile.email);
+			console.log("  Photo URL: "+profile.photoURL);
+		});
+	  } else {
+		// No user is signed in.
+		$("#logOut").hide();
+	  }
+	});
+	
+	function resetPassword() {
+		var emailAddress = "user@example.com";
+
+		auth.sendPasswordResetEmail(emailAddress).then(function() {
+		  // Email sent.
+		}, function(error) {
+		  // An error happened.
+		});
+	}
+	
+	function toggle() {
+		var toggle = $("#toggle").val();
+		if (toggle == "Log in") {
+			$("#register").hide();
+			$("#login").show();
+			$("#toggle").val("Sign Up");
+		} else {
+			$("#register").show();
+			$("#login").hide();
+			$("#toggle").val("Log in");
+		}
+	}
+</script>
+</head>
+	<body>
+	<script>
+	// This is called with the results from from FB.getLoginStatus().
+  function statusChangeCallback(response) {
+    console.log('statusChangeCallback');
+    console.log(response);
+    // The response object is returned with a status field that lets the
+    // app know the current login status of the person.
+    // Full docs on the response object can be found in the documentation
+    // for FB.getLoginStatus().
+    if (response.status === 'connected') {
+      // Logged into your app and Facebook.
+      testAPI();
+    } else if (response.status === 'not_authorized') {
+      // The person is logged into Facebook, but not your app.
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into this app.';
+    } else {
+      // The person is not logged into Facebook, so we're not sure if
+      // they are logged into this app or not.
+      document.getElementById('status').innerHTML = 'Please log ' +
+        'into Facebook.';
+    }
+  }
+  
+		// This function is called when someone finishes with the Login
+  // Button.  See the onlogin handler attached to it in the sample
+  // code below.
+  function checkLoginState() {
+    FB.getLoginStatus(function(response) {
+      statusChangeCallback(response);
+    },{scope: 'email,public_profile'});
+  }
+	
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1026982900682377',
+      xfbml      : true,
+      version    : 'v2.6'
+    });
+	
+	 // Now that we've initialized the JavaScript SDK, we call 
+  // FB.getLoginStatus().  This function gets the state of the
+  // person visiting this page and can return one of three states to
+  // the callback you provide.  They can be:
+  //
+  // 1. Logged into your app ('connected')
+  // 2. Logged into Facebook, but not your app ('not_authorized')
+  // 3. Not logged into Facebook and can't tell if they are logged into
+  //    your app or not.
+  //
+  // These three cases are handled in the callback function.
+
+  FB.getLoginStatus(function(response) {
+    statusChangeCallback(response);
+  });
+  };
+  
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+   
+   // Here we run a very simple test of the Graph API after login is
+  // successful.  See statusChangeCallback() for when this call is made.
+  function testAPI() {
+    console.log('Welcome!  Fetching your information.... ');
+    FB.api('/me', function(response) {
+      console.log('Successful login for: ' + response.name);
+      document.getElementById('status').innerHTML =
+        'Thanks for logging in, ' + response.name + '!';
+    });
+  }
+  
+  
+</script>
+		<h1>Welcome to Firebase Website</h1>
+		
+		<div id="register">
+			<strong>Register New Account</strong><br/><br/>
+			Enter email: <input type="email" id="signUpEmail">
+				<br/>
+			Enter password: <input type="password" id="signUpPassword"><br/><br/>
+			<input type="button" onclick="createNewUser();" value="Sign Up">
+		</div>
+		<div id="login">
+			<strong>Login</strong><br/><br/>
+			Enter email: <input type="email" id="loginEmail">
+							<br/>
+			Enter password: <input type="password" id="loginPassword"><br/><br/>
+			<input type="button" value="Login" onclick="login()">
+			<input type="button" value="Google Login" onclick="googleLogin()">
+			<!--
+  Below we include the Login Button social plugin. This button uses
+  the JavaScript SDK to present a graphical Login button that triggers
+  the FB.login() function when clicked.
+-->
+<fb:login-button scope="public_profile,email" onlogin="fbLogin();">
+</fb:login-button>
+
+<input type="button" value="Facebook Login" onclick="fbLogin()">
+
+<div id="status">
+</div>
+		</div>
+		<br/>
+		<input type="button" id="toggle" onclick="toggle()" value="Log in">
+		<br/><br/>
+		<input type="button" id="logOut" onclick="logOut()" value="Log Out">
+	</body>
+</html>
