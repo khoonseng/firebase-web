@@ -1,0 +1,62 @@
+<html>
+<script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
+<script>
+  // Initialize Firebase
+  var config = {
+    apiKey: "AIzaSyBVsuRwgD8HOft-_9qM-VxUAmdh74FvHkY",
+    authDomain: "ks-realtimeapp.firebaseapp.com",
+    databaseURL: "https://ks-realtimeapp.firebaseio.com",
+    storageBucket: "ks-realtimeapp.appspot.com",
+  };
+  firebase.initializeApp(config);
+</script>
+<!--script src="https://cdn.firebase.com/js/client/2.4.2/firebase.js"></script-->
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js'></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+<script src="https://cdn.firebase.com/libs/angularfire/1.2.0/angularfire.min.js"></script>
+<script>
+	//var firebase = new Firebase("https://ks-realtimeapp.firebaseio.com/");
+	var usersRef = firebase.database().ref("users");
+	
+	function createNewUser() {
+		var newUsersRef = usersRef.push(
+		{
+			isOnline: false,
+			name: $("#name").val()
+		});
+	}
+	
+	function retrieveUsers() {
+		usersRef.orderByChild("name").limitToFirst(20).on("value", function(snapshot){
+			$("#users").empty();
+			snapshot.forEach(function(data) {
+				var name = data.child("name").val();
+				var isOnline = data.child("isOnline").val();
+				console.log(name + " : " + isOnline);
+				$("#users").append(name + " : " + isOnline + "<br/>");
+			});
+		});
+	}
+	
+	function retrieveUser(name) {
+		usersRef.on("value", function(snapshot){
+			$("#users").empty();
+			snapshot.forEach(function(data) {
+				var name = data.child("name").val();
+				var isOnline = data.child("isOnline").val();
+				console.log(name + " : " + isOnline);
+				$("#users").append(name + " : " + isOnline + "<br/>");
+			});
+		});
+	}
+</script>
+<body>
+Enter name: <input type="text" id="name">
+<input type="button" onclick="createNewUser()" value="Sign Up">
+<br/><br/>
+
+<input type="button" onclick="retrieveUsers()" value="Retrieve all users">
+<div id="users"></div>
+
+</body>
+</html>
