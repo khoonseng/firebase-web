@@ -26,13 +26,14 @@
 	
 	$( document ).ready(function() {
 		console.log( "ready!" );
-		$("#login").hide();
 		if (user) {
 		  // User is signed in.
-		  $("#logOut").show();
+		  //$("#logOut").show();
+		  displayMainPage();
 		} else {
 		  // No user is signed in.
-		  $("#logOut").hide();
+		  //$("#logOut").hide();
+		  displayLoginPage();
 		}
 	});
 
@@ -49,9 +50,40 @@
 				name: email,
 				isOnline: true
 			});
+			
+			var username = email.substring(0, email.lastIndexOf("@"));
+			//$("#username").val(username);
+			//$("#username").innerHTML = username;
+			displayMainPage();
 		}, function(error) {
 		  console.log(error.code + " : " + error.message);
+		  if (error.code == "auth/invalid-email") {
+			alert("Please enter a valid email");
+		  }
+		  if (error.code == "auth/weak-password") {
+			alert("Password must be at least 6 characters long");
+		  }
+		  if (error.code == "auth/email-already-in-use") {
+			alert("The email address is already in use by another account");
+		  }
 		});
+	}
+	
+	function displayLoginPage() {
+		$("#register").show();
+		$("#toggle").show();
+		$("#toggle").val("Log in");
+		$("#login").hide();
+		$("#logOut").hide();
+		$("#main").hide();
+	}
+	
+	function displayMainPage() {
+		$("#register").hide();
+		$("#toggle").hide();
+		$("#login").hide();
+		$("#logOut").show();
+		$("#main").show();
 	}
 	
 	function updateOnlineStatus(status, user) {
@@ -68,6 +100,7 @@
 			updateOnlineStatus(true, user);
 		},function(error) {
 		  console.log(error.code + " : " + error.message);
+		  alert(error.message);
 		});
 	}
 			
@@ -77,7 +110,7 @@
 		firebase.auth().signOut().then(function() {
 		  // Sign-out successful.
 			updateOnlineStatus(false, user);
-			$("#logOut").hide();
+			displayLoginPage();
 		}, function(error) {
 		  // An error happened.
 		  console.log(error.code + " : " + error.message);
@@ -110,6 +143,7 @@
 				username = user.displayName;
 			}
 			console.log(username);
+			$("#username").val(username);
 			usersRef.child(user.uid).set({
 				name: username,
 				isOnline: true
@@ -144,6 +178,7 @@
 	  }
 	});
 	
+	/*
 	function resetPassword() {
 		var emailAddress = "user@example.com";
 
@@ -152,7 +187,7 @@
 		}, function(error) {
 		  // An error happened.
 		});
-	}
+	}*/
 	
 	function toggle() {
 		var toggle = $("#toggle").val();
@@ -268,13 +303,16 @@
   the JavaScript SDK to present a graphical Login button that triggers
   the FB.login() function when clicked.
 -->
-<fb:login-button scope="public_profile,email" onlogin="fbLogin();">
-</fb:login-button>
+<!--fb:login-button scope="public_profile,email" onlogin="fbLogin();">
+</fb:login-button-->
 
 <input type="button" value="Facebook Login" onclick="fbLogin()">
 
 <div id="status">
 </div>
+		</div>
+		<div id="main">
+			<label id="username"></label>, Welcome to main page!
 		</div>
 		<br/>
 		<input type="button" id="toggle" onclick="toggle()" value="Log in">
