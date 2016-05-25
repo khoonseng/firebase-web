@@ -53,7 +53,7 @@
 			
 			var username = email.substring(0, email.lastIndexOf("@"));
 			//$("#username").val(username);
-			//$("#username").innerHTML = username;
+			$("#username").html = username;
 			displayMainPage();
 		}, function(error) {
 		  console.log(error.code + " : " + error.message);
@@ -97,6 +97,11 @@
 		firebase.auth().signInWithEmailAndPassword(email, password).then(function() {	
 			user = firebase.auth().currentUser;
 			console.log(user.uid);
+			
+			var username = email.substring(0, email.lastIndexOf("@"));
+			//$("#username").val(username);
+			$("#username").html = username;
+			
 			updateOnlineStatus(true, user);
 		},function(error) {
 		  console.log(error.code + " : " + error.message);
@@ -282,6 +287,8 @@
   
   
 </script>
+	<a href="dashboard.html">Back to Samples</a>
+	<br/><br/>
 		<h1>Welcome to Firebase Website</h1>
 		
 		<div id="register">
