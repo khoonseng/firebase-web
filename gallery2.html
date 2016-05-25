@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>CSS Image Gallery</title>
+		<link rel="stylesheet" href="css/reset.css" type="text/css" />
+		<link rel="stylesheet" href="css/style2.css" type="text/css" />
+		<link rel="stylesheet" href="css/fancybox/jquery.fancybox.css" type="text/css" />
+		<link rel="stylesheet" href="css/fancybox/jquery.fancybox-buttons.css" type="text/css" />
+		<link rel="stylesheet" href="css/fancybox/jquery.fancybox-thumbs.css" type="text/css" />
+		
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+		<script src="js/quicksand/jquery.quicksand.js"></script>
+		<script src="js/fancybox/jquery.fancybox.js"></script>
+		<script src="js/fancybox/jquery.fancybox.pack.js"></script>
+		<script src="js/fancybox/jquery.fancybox-buttons.js"></script>
+		<script src="js/fancybox/jquery.fancybox-thumbs.js"></script>
+		<script src="js/fancybox/jquery.fancybox-media.js"></script>
+		<script src="js/script2.js"></script>
+    </head>
+    <body>
+		<a href="dashboard.html">Back to Samples</a>
+		<br/><br/>
+		<header>
+			<div class="container">
+				<img src="images/logo.png" class="logo">
+			</div>
+		</header>
+		<div class="container">
+			<section>
+				<div class="gallery">
+					<a class="fancybox" data-fancybox-group="gallery" data-filter="category1" href="images/image1.jpg"><img src="images/image1.jpg"></a>
+					<a class="fancybox" data-fancybox-group="gallery" data-filter="category1" href="images/image2.jpg"><img src="images/image2.jpg"></a>
+					<a class="fancybox" data-fancybox-group="gallery" data-filter="category2" href="images/image3.jpg"><img src="images/image3.jpg"></a>
+					<a class="fancybox" data-fancybox-group="gallery" data-filter="category1" href="images/image4.jpg"><img src="images/image4.jpg"></a>
+					<a class="fancybox" data-fancybox-group="gallery" data-filter="category2" href="images/image5.jpg"><img src="images/image5.jpg"></a>
+					<a class="fancybox" data-fancybox-group="gallery" data-filter="category2" href="images/image6.jpg"><img src="images/image6.jpg"></a>
+				</div>
+			</section>
+			<aside>
+				<nav>
+					<a data-rel="all" href="javascript:;" class="filter active">View all</a>
+					<a data-rel="category1" href="javascript:;" class="filter">Category 1</a>
+					<a data-rel="category2" href="javascript:;" class="filter">Category 2</a>
+				</nav>
+			</aside>
+		</div><!-- container -->
+		<footer>
+			<div class="container">
+				<p>Copyright &copy; 2016</p>
+			</div><!-- container -->
+		</footer>
+
+    </body>
+</html>
